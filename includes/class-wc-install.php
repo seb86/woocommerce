@@ -72,6 +72,10 @@ class WC_Install {
 			'wc_update_260_refunds',
 			'wc_update_260_db_version',
 		),
+		'2.7.0' => array(
+			'wc_update_270_customers',
+			'wc_update_270_db_version',
+		),
 	);
 
 	/** @var object Background update class */
@@ -690,7 +694,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_termmeta (
 			'view_woocommerce_reports'
 		);
 
-		$capability_types = array( 'product', 'shop_order', 'shop_coupon', 'shop_webhook' );
+		$capability_types = array( 'customer', 'product', 'shop_order', 'shop_coupon', 'shop_webhook' );
 
 		foreach ( $capability_types as $capability_type ) {
 
