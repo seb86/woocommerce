@@ -459,6 +459,28 @@ CREATE TABLE {$wpdb->prefix}woocommerce_attribute_taxonomies (
   PRIMARY KEY  (attribute_id),
   KEY attribute_name (attribute_name($max_index_length))
 ) $collate;
+CREATE TABLE {$wpdb->prefix}woocommerce_customers (
+  customer_id bigint(20) NOT NULL auto_increment,
+  user_id bigint(20) NULL,
+  email varchar(50) NULL,
+  name mediumtext NULL,
+  registered datetime NULL default null,
+  order_ids longtext NULL default null,
+  purchase_count bigint(20) NOT NULL default 0,
+  guest_key bigint(20) NOT NULL,
+  PRIMARY KEY  (customer_id),
+  UNIQUE KEY email (email),
+  KEY user_id (user_id)
+) $collate;
+CREATE TABLE {$wpdb->prefix}woocommerce_customer_meta (
+  meta_id bigint(20) NOT NULL auto_increment,
+  customer_id bigint(20) NULL default null,
+  meta_key varchar(255) NULL default null,
+  meta_value longtext NULL default null,
+  PRIMARY KEY  (meta_id),
+  KEY customer_id (customer_id),
+  KEY meta_key (meta_key($max_index_length))
+) $collate;
 CREATE TABLE {$wpdb->prefix}woocommerce_downloadable_product_permissions (
   permission_id bigint(20) NOT NULL auto_increment,
   download_id varchar(32) NOT NULL,
