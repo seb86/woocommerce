@@ -352,6 +352,8 @@ global $wpdb;
 				'woocommerce_sessions',
 				'woocommerce_api_keys',
 				'woocommerce_attribute_taxonomies',
+				'woocommerce_customers',
+				'woocommerce_customer_meta',
 				'woocommerce_downloadable_product_permissions',
 				'woocommerce_order_items',
 				'woocommerce_order_itemmeta',
