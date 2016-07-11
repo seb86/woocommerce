@@ -893,6 +893,8 @@ CREATE TABLE {$wpdb->prefix}woocommerce_termmeta (
 		$tables[] = $wpdb->prefix . 'woocommerce_sessions';
 		$tables[] = $wpdb->prefix . 'woocommerce_api_keys';
 		$tables[] = $wpdb->prefix . 'woocommerce_attribute_taxonomies';
+		$tables[] = $wpdb->prefix . 'woocommerce_customers';
+		$tables[] = $wpdb->prefix . 'woocommerce_customer_meta';
 		$tables[] = $wpdb->prefix . 'woocommerce_downloadable_product_permissions';
 		$tables[] = $wpdb->prefix . 'woocommerce_termmeta';
 		$tables[] = $wpdb->prefix . 'woocommerce_tax_rates';
