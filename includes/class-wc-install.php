@@ -691,6 +691,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_termmeta (
 
 		$capabilities['core'] = array(
 			'manage_woocommerce',
+			'view_woocommerce_customers',
 			'view_woocommerce_reports'
 		);
 
