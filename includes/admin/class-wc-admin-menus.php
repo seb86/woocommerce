@@ -25,6 +25,7 @@ class WC_Admin_Menus {
 	public function __construct() {
 		// Add menus
 		add_action( 'admin_menu', array( $this, 'admin_menu' ), 9 );
+		add_action( 'admin_menu', array( $this, 'customers_menu' ), 15 );
 		add_action( 'admin_menu', array( $this, 'reports_menu' ), 20 );
 		add_action( 'admin_menu', array( $this, 'settings_menu' ), 50 );
 		add_action( 'admin_menu', array( $this, 'status_menu' ), 60 );
@@ -60,6 +61,18 @@ class WC_Admin_Menus {
 		add_menu_page( __( 'WooCommerce', 'woocommerce' ), __( 'WooCommerce', 'woocommerce' ), 'manage_woocommerce', 'woocommerce', null, null, '55.5' );
 
 		add_submenu_page( 'edit.php?post_type=product', __( 'Attributes', 'woocommerce' ), __( 'Attributes', 'woocommerce' ), 'manage_product_terms', 'product_attributes', array( $this, 'attributes_page' ) );
+	}
+
+	/**
+	 * Add menu item.
+	 */
+	public function customers_menu() {
+		global $customers_page;
+
+		if ( current_user_can( 'manage_woocommerce' ) ) {
+			$customers_page = add_submenu_page( 'woocommerce', __( 'Customers', 'woocommerce' ),  __( 'Customers', 'woocommerce' ) , 'view_woocommerce_customers', 'wc-customers', array( $this, 'customers_page' ) );
+			add_action( "load-$customers_page", array( 'WC_Admin_Customers', 'screen_option' ) );
+		}
 	}
 
 	/**
@@ -190,6 +203,13 @@ class WC_Admin_Menus {
 	 */
 	public function custom_menu_order() {
 		return current_user_can( 'manage_woocommerce' );
+	}
+
+	/**
+	 * Init the customers page.
+	 */
+	public function customers_page() {
+		WC_Admin_Customers::output();
 	}
 
 	/**
