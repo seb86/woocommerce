@@ -22,11 +22,13 @@ function wc_get_screen_ids() {
 	$wc_screen_id = sanitize_title( __( 'WooCommerce', 'woocommerce' ) );
 	$screen_ids   = array(
 		'toplevel_page_' . $wc_screen_id,
+		$wc_screen_id . '_page_wc-customers',
 		$wc_screen_id . '_page_wc-reports',
 		$wc_screen_id . '_page_wc-shipping',
 		$wc_screen_id . '_page_wc-settings',
 		$wc_screen_id . '_page_wc-status',
 		$wc_screen_id . '_page_wc-addons',
+		'toplevel_page_wc-customers',
 		'toplevel_page_wc-reports',
 		'product_page_product_attributes',
 		'edit-product',
