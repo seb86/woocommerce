@@ -2,7 +2,7 @@
 /**
  * Admin Customers
  *
- * Functions used for displaying customers and their details in admin.
+ * Functions used for displaying customers and their details in the admin.
  *
  * @author   WooThemes
  * @category Admin
@@ -64,7 +64,7 @@ class WC_Admin_Customers {
 	 * @access public
 	 */
 	public static function output() {
-		if ( !isset( $_GET['view-user'] ) ) {
+		if ( ! isset( $_GET['view-user'] ) ) {
 
 			include_once( 'customers/class-wc-admin-customers-table.php' );
 			return self::get_customers();
@@ -104,27 +104,12 @@ class WC_Admin_Customers {
 	}
 
 	/**
-	 * Returns the total amount of customers.
-	 *
-	 * @global $wpdb
-	 * @return init
-	 */
-	/*public static function wc_count_customers() {
-		global $wpdb;
-
-		$customer_count = $wpdb->get_var( "SELECT COUNT(*) FROM " . $wpdb->prefix . "woocommerce_customers" );
-
-		return $customer_count;
-	}*/
-
-	/**
 	 * Maybe display a blank state if you have no customers.
 	 *
 	 * @access public
 	 * @return void
 	 */
 	public static function maybe_render_no_customers( $customers ) {
-		//if ( 0 < self::wc_count_customers() ) { return; }
 		if ( 0 < $customers->total_customers() ) { return; }
 	?>
 	<div class="woocommerce-BlankState">
