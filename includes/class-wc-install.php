@@ -471,6 +471,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_customers (
   registered datetime NULL default null,
   order_ids longtext NULL default null,
   purchase_count bigint(20) NOT NULL default 0,
+  total_spent bigint(20) NOT NULL default 0,
   guest_key bigint(20) NOT NULL,
   PRIMARY KEY  (customer_id),
   UNIQUE KEY email (email),
