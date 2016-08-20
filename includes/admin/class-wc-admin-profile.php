@@ -23,11 +23,21 @@ class WC_Admin_Profile {
 	 * Hook in tabs.
 	 */
 	public function __construct() {
-		add_action( 'show_user_profile', array( $this, 'add_customer_meta_fields' ) );
-		add_action( 'edit_user_profile', array( $this, 'add_customer_meta_fields' ) );
+		/**
+		 * If the user is not registered as a customer, 
+		 * then add customer fields to WordPress user profile.
+		 *
+		 * @since 2.7.0
+		 */
+		$customer = wc_get_customer( get_current_user_id(), 'customer_id' ); // Find customer
 
-		add_action( 'personal_options_update', array( $this, 'save_customer_meta_fields' ) );
-		add_action( 'edit_user_profile_update', array( $this, 'save_customer_meta_fields' ) );
+		if ( ! isset( $customer ) ) {
+			add_action( 'show_user_profile', array( $this, 'add_customer_meta_fields' ) );
+			add_action( 'edit_user_profile', array( $this, 'add_customer_meta_fields' ) );
+
+			add_action( 'personal_options_update', array( $this, 'save_customer_meta_fields' ) );
+			add_action( 'edit_user_profile_update', array( $this, 'save_customer_meta_fields' ) );
+		}
 	}
 
 	/**
