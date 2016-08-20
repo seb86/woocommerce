@@ -159,20 +159,23 @@ class WC_Customers_Table extends WP_List_Table {
 		switch ( $column_name ) {
 
 			case 'thumb' :
-				$value = '<a href="' . esc_url( admin_url( '/admin.php?page=wc-customers&view-user=' . esc_html( $item['customer_id'] ) ) ) . '">' . get_avatar( $item['email'], 32 ) . '</a>';
+				$value = '<a href="' . esc_url( admin_url( 'admin.php?page=wc-customers&view-user=' . esc_html( $item['customer_id'] ) ) ) . '">' . get_avatar( $item['email'], 32 ) . '</a>';
 				break;
 
 			case 'customer_id':
-				$value = '#' . $item['customer_id'] . ' - <a href="' . esc_url( admin_url( '/admin.php?page=wc-customers&view-user=' . esc_html( $item['customer_id'] ) ) ) . '">' . esc_html( __( 'View Customer', 'woocommerce' ) ) . '</a>';
+				$value = '#' . $item['customer_id'] . ' - <a href="' . esc_url( admin_url( 'admin.php?page=wc-customers&view-user=' . esc_html( $item['customer_id'] ) ) ) . '">' . esc_html( __( 'View Customer', 'woocommerce' ) ) . '</a>';
 				break;
 
 			case 'name':
-				$value = '<strong>' . $item[ $column_name ] . '</strong>';
+				$value = '<strong>' . esc_html( $item[ $column_name ] ) . '</strong>';
 				break;
 
 			case 'email':
+				$value = esc_html( $item[ $column_name ] );
+				break;
+
 			case 'purchase_count':
-				$value = $item[ $column_name ];
+				$value = '<a href="' . esc_url( admin_url( 'edit.php?post_status=all&post_type=shop_order&_customer_user=' . esc_html( $item['customer_id'] ) ) ) . '">' . $item[ $column_name ] . '</a>';
 				break;
 
 			case 'customer_type':
