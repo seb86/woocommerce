@@ -476,7 +476,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_customers (
   UNIQUE KEY email (email),
   KEY user_id (user_id)
 ) $collate;
-CREATE TABLE {$wpdb->prefix}woocommerce_customer_meta (
+CREATE TABLE {$wpdb->prefix}woocommerce_customermeta (
   meta_id bigint(20) NOT NULL auto_increment,
   customer_id bigint(20) NULL default null,
   meta_key varchar(255) NULL default null,
