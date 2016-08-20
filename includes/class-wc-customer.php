@@ -4,7 +4,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-
 /**
  * Customer
  *
@@ -31,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string $is_vat_exempt
  * @property string $calculated_shipping
  */
-class WC_Customer {
+class WC_Customer extends WC_Abstract_Customer {
 
 	/**
 	 * Stores customer data.
@@ -198,10 +197,17 @@ class WC_Customer {
 	/**
 	 * Is the user a paying customer?
 	 *
+	 * @param  int  $user_id
 	 * @return bool
 	 */
 	public function is_paying_customer( $user_id ) {
-		return '1' === get_user_meta( $user_id, 'paying_customer', true );
+		_deprecated_function( 'is_paying_customer', '2.7', 'wc_get_customer' );
+
+		$customer = wc_get_customer( $user_id, 'customer_id' );
+
+		if ( isset( $customer ) && $customer > 0 ) {
+			return true;
+		}
 	}
 
 	/**
@@ -559,7 +565,7 @@ class WC_Customer {
 	}
 
 	/**
-	 * Gets a user's downloadable products if they are logged in.
+	 * Gets a customer's downloadable products if they are logged in.
 	 *
 	 * @return array Array of downloadable products
 	 */
@@ -567,9 +573,10 @@ class WC_Customer {
 		$downloads = array();
 
 		if ( is_user_logged_in() ) {
-			$downloads = wc_get_customer_available_downloads( get_current_user_id() );
+			$downloads = wc_get_customer_available_downloads( wc_get_customer_id( get_current_user_id() ) );
 		}
 
 		return apply_filters( 'woocommerce_customer_get_downloadable_products', $downloads );
 	}
+
 }
