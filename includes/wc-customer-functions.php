@@ -21,9 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param  string $meta_key    (Required) The meta key
  * @param  mixed  $meta_value  (Required) The meta value
  * @param  bool   $unique      (Optional) Default false.
-                               Whether the specified metadata key should be unique for the object.
-                               If true, and the object already has a value for the specified metadata key,
-                               no change will be made.
+ *                             Whether the specified metadata key should be unique for the object.
+ *                             If true, and the object already has a value for the specified metadata key,
+ *                             no change will be made.
  * @return mixed               Will be an array if $single is false. Will be value of meta data field if $single is true.
  */
 function wc_add_customer_meta( $customer_id, $meta_key, $meta_value, $unique = false ) {
@@ -47,8 +47,8 @@ function wc_get_customer_meta( $customer_id = 0, $meta_key = '', $single = false
  *
  * @param  int      $customer_id (Required) The customer ID is for
  * @param  string   $meta_key    (Required) The meta key
- * @param  mixed    $meta_value
- * @param  mixed    $prev_value
+ * @param  mixed    $meta_value  (Required) The meta value to update
+ * @param  mixed    $prev_value  (Required) The previous meta value to change
  * @return int|bool
  */
 function wc_update_customer_meta( $customer_id, $meta_key, $meta_value, $prev_value = '' ) {
