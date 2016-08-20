@@ -119,7 +119,7 @@ abstract class WC_Abstract_Customer {
 	 * Return the customer orders IDs.
 	 *
 	 * @since  2.7.0
-	 * @return array customer order ID
+	 * @return array customer order IDs
 	 */
 	public function get_customer_order_ids() {
 		return $this->order_ids;
@@ -160,10 +160,9 @@ abstract class WC_Abstract_Customer {
 	 *
 	 * @access protected
 	 * @since  2.7.0
-	 * @param  int|object|WC_Customer $customer Customer to init.
 	 * @return array $customer_meta
 	 */
-	protected function get_customer_meta( $customer ) {
+	protected function get_customer_meta() {
 		$default_meta_keys = array(
 			'billing_address_1',
 			'billing_address_2',
@@ -183,7 +182,7 @@ abstract class WC_Abstract_Customer {
 
 		// For each default meta key, get the customer meta.
 		foreach ( $default_meta_keys as $meta ) {
-			$customer_meta[$meta] = wc_get_customer_meta( $meta, $customer->ID, true );
+			$customer_meta[$meta] = wc_get_customer_meta( $meta, $this->get_customer_id(), true );
 		}
 
 		/**
