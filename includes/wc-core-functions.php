@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Include core functions (available in both admin and frontend).
 include( 'wc-conditional-functions.php' );
 include( 'wc-coupon-functions.php' );
+include( 'wc-customer-functions.php' );
 include( 'wc-user-functions.php' );
 include( 'wc-deprecated-functions.php' );
 include( 'wc-formatting-functions.php' );
