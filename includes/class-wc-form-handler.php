@@ -7,11 +7,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Handle frontend forms.
  *
- * @class 		WC_Form_Handler
- * @version		2.2.0
- * @package		WooCommerce/Classes/
- * @category	Class
- * @author 		WooThemes
+ * @class    WC_Form_Handler
+ * @version  2.7.0
+ * @package  WooCommerce/Classes/
+ * @category Class
+ * @author   WooThemes
  */
 class WC_Form_Handler {
 
@@ -67,9 +67,9 @@ class WC_Form_Handler {
 			return;
 		}
 
-		$user_id = get_current_user_id();
+		$customer_id = wc_get_customer_id( get_current_user_id() );
 
-		if ( $user_id <= 0 ) {
+		if ( $customer_id <= 0 ) {
 			return;
 		}
 
@@ -139,12 +139,12 @@ class WC_Form_Handler {
 		if ( wc_notice_count( 'error' ) == 0 ) {
 
 			foreach ( $address as $key => $field ) {
-				update_user_meta( $user_id, $key, $_POST[ $key ] );
+				wc_update_customer_meta( $customer_id, $key, $_POST[ $key ] );
 			}
 
 			wc_add_notice( __( 'Address changed successfully.', 'woocommerce' ) );
 
-			do_action( 'woocommerce_customer_save_address', $user_id, $load_address );
+			do_action( 'woocommerce_customer_save_address', $customer_id, $load_address );
 
 			wp_safe_redirect( wc_get_page_permalink( 'myaccount' ) );
 			exit;
