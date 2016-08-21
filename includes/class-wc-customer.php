@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @property string $is_vat_exempt
  * @property string $calculated_shipping
  */
-class WC_Customer extends WC_Abstract_Customer {
+class WC_Customer {
 
 	/**
 	 * Stores customer data.
@@ -205,7 +205,11 @@ class WC_Customer extends WC_Abstract_Customer {
 
 		$customer = wc_get_customer( $user_id, 'customer_id' );
 
-		if ( isset( $customer ) && $customer > 0 ) {
+		/**
+		 * If the customer exists and the customer has spent a total 
+		 * higher than zero, then the user is a paying customer.
+		 */
+		if ( isset( $customer ) && $customer > 0 && $this->get_customer_total_spent() > 0 ) {
 			return true;
 		}
 	}
@@ -577,6 +581,103 @@ class WC_Customer extends WC_Abstract_Customer {
 		}
 
 		return apply_filters( 'woocommerce_customer_get_downloadable_products', $downloads );
+	}
+
+	/**
+	 * Create a new customer.
+	 *
+	 * @since 2.7.0.
+	 */
+	public function create() {
+		/**
+		 * First check that the user has not registered first already.
+		 *
+		 * 1. Has user registered with email? If so then return the user ID.
+		 * 2. If no user account exists then create a new user and return the user ID.
+		 */
+		if ( $user = get_user_by( 'email', $this->get_email() ) ) {
+			$user_id = $user->ID;
+		} else {
+			$user_id = wc_create_new_user( $this->get_email(), $this->get_username(), $this->_data['password'] );
+		}
+
+		if ( ! is_wp_error( $user_id ) ) {
+
+			// Now we create the customer and return the customer ID.
+			$customer_id = wc_create_new_customer( $user_id );
+
+			// Add the customers billing and shipping details
+			wc_add_customer_meta( $customer_id, 'billing_first_name', $this->get_billing_first_name() );
+			wc_add_customer_meta( $customer_id, 'billing_last_name', $this->get_billing_last_name() );
+			wc_add_customer_meta( $customer_id, 'billing_company', $this->get_billing_company() );
+			wc_add_customer_meta( $customer_id, 'billing_phone', $this->get_billing_phone() );
+			wc_add_customer_meta( $customer_id, 'billing_email', $this->get_billing_email() );
+			wc_add_customer_meta( $customer_id, 'billing_address_1', $this->get_billing_address() );
+			wc_add_customer_meta( $customer_id, 'billing_address_2', $this->get_billing_address_2() );
+			wc_add_customer_meta( $customer_id, 'billing_city', $this->get_billing_city() );
+			wc_add_customer_meta( $customer_id, 'billing_postcode', $this->get_billing_postcode() );
+			wc_add_customer_meta( $customer_id, 'billing_country', $this->get_billing_country() );
+			wc_add_customer_meta( $customer_id, 'billing_state', $this->get_billing_state() );
+			wc_add_customer_meta( $customer_id, 'shipping_first_name', $this->get_shipping_first_name() );
+			wc_add_customer_meta( $customer_id, 'shipping_last_name', $this->get_shipping_last_name() );
+			wc_add_customer_meta( $customer_id, 'shipping_company', $this->get_shipping_company() );
+			wc_add_customer_meta( $customer_id, 'shipping_address_1', $this->get_shipping_address() );
+			wc_add_customer_meta( $customer_id, 'shipping_address_2', $this->get_shipping_address_2() );
+			wc_add_customer_meta( $customer_id, 'shipping_city', $this->get_shipping_city() );
+			wc_add_customer_meta( $customer_id, 'shipping_postcode', $this->get_shipping_postcode() );
+			wc_add_customer_meta( $customer_id, 'shipping_country', $this->get_shipping_country() );
+			wc_add_customer_meta( $customer_id, 'shipping_state', $this->get_shipping_state() );
+
+			// Other customer meta data
+			wc_add_customer_meta( $customer_id, 'paying_customer', $this->is_paying_customer() );
+			wc_add_customer_meta( $customer_id, 'last_updated', $this->get_date_modified() );
+
+			// Allow third party plugins to hook in and add their own customer meta data.
+			do_action( 'woocommerce_create_customer', $user_id, $customer_id );
+		}
+	}
+
+	/**
+	 * Update the customer.
+	 *
+	 * @since 2.7.0.
+	 */
+	public function update( $customer_id = 0 ) {
+		// Check if we are updating a specific customer.
+		if ( isset( $customer_id ) && $customer_id > 0 ) {
+			$customer_id = wc_get_customer_id( $customer_id );
+		}
+
+		// Add the customers billing and shipping details
+		wc_update_customer_meta( $customer_id, 'billing_first_name', $this->get_billing_first_name( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'billing_last_name', $this->get_billing_last_name( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'billing_company', $this->get_billing_company( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'billing_phone', $this->get_billing_phone( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'billing_email', $this->get_billing_email( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'billing_address_1', $this->get_billing_address( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'billing_address_2', $this->get_billing_address_2( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'billing_city', $this->get_billing_city( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'billing_postcode', $this->get_billing_postcode( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'billing_country', $this->get_billing_country( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'billing_state', $this->get_billing_state( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'shipping_first_name', $this->get_shipping_first_name( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'shipping_last_name', $this->get_shipping_last_name( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'shipping_company', $this->get_shipping_company( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'shipping_address_1', $this->get_shipping_address( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'shipping_address_2', $this->get_shipping_address_2( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'shipping_city', $this->get_shipping_city( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'shipping_postcode', $this->get_shipping_postcode( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'shipping_country', $this->get_shipping_country( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'shipping_state', $this->get_shipping_state( $customer_id ) );
+
+		// Other customer meta data
+		wc_update_customer_meta( $customer_id, 'paying_customer', $this->is_paying_customer( $customer_id ) );
+		wc_update_customer_meta( $customer_id, 'last_updated', $this->get_date_modified( $customer_id ) );
+
+		$user_id = wc_get_customer_user_id( $customer_id );
+
+		// Allow third party plugins to hook in and update their own customer meta data.
+		do_action( 'woocommerce_update_customer', $user_id, $customer_id );
 	}
 
 }
