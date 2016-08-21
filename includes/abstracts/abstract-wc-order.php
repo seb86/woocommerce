@@ -33,7 +33,7 @@
  * @property    string $cart_discount Total amount of discount.
  * @property    string $cart_discount_tax Total amount of discount applied to taxes.
  * @property    string $shipping_method_title < 2.1 was used for shipping method title. Now @deprecated.
- * @property    int $customer_user User ID who the order belongs to. 0 for guests.
+ * @property    int $customer_user Customer ID who the order belongs to. 0 for guests.
  * @property    string $order_key Random key/password unqique to each order.
  * @property    string $order_discount Stored after tax discounts pre-2.3. Now @deprecated.
  * @property    string $order_tax Stores order tax total.
@@ -964,9 +964,9 @@ abstract class WC_Abstract_Order {
 		$this->customer_note       = $result->post_excerpt;
 		$this->post_status         = $result->post_status;
 
-		// Billing email can default to user if set.
-		if ( empty( $this->billing_email ) && ! empty( $this->customer_user ) && ( $user = get_user_by( 'id', $this->customer_user ) ) ) {
-			$this->billing_email = $user->user_email;
+		// Billing email can default to customer if set.
+		if ( empty( $this->billing_email ) && ! empty( $this->customer_user ) ) {
+			$this->billing_email = wc_get_customer( $this->customer_user, 'email' );
 		}
 
 		// Orders store the state of prices including tax when created.
@@ -998,8 +998,8 @@ abstract class WC_Abstract_Order {
 		// Get values or default if not set.
 		if ( 'completed_date' === $key ) {
 			$value = ( $value = get_post_meta( $this->id, '_completed_date', true ) ) ? $value : $this->modified_date;
-		} elseif ( 'user_id' === $key ) {
-			$value = ( $value = get_post_meta( $this->id, '_customer_user', true ) ) ? absint( $value ) : '';
+		} elseif ( 'customer_id' === $key ) {
+			$value = ( $value = wc_get_customer_id() ) ? absint( $value ) : '';
 		} elseif ( 'status' === $key ) {
 			$value = $this->get_status();
 		} else {
@@ -2313,9 +2313,8 @@ abstract class WC_Abstract_Order {
 	 */
 	public function add_order_note( $note, $is_customer_note = 0, $added_by_user = false ) {
 		if ( is_user_logged_in() && current_user_can( 'edit_shop_order', $this->id ) && $added_by_user ) {
-			$user                 = get_user_by( 'id', get_current_user_id() );
-			$comment_author       = $user->display_name;
-			$comment_author_email = $user->user_email;
+			$comment_author       = wc_get_customer( get_current_user_id(), 'name' );
+			$comment_author_email = wc_get_customer( get_current_user_id(), 'email' );
 		} else {
 			$comment_author       = __( 'WooCommerce', 'woocommerce' );
 			$comment_author_email = strtolower( __( 'WooCommerce', 'woocommerce' ) ) . '@';
