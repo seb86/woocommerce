@@ -32,17 +32,17 @@ function wc_disable_admin_bar( $show_admin_bar ) {
 }
 add_filter( 'show_admin_bar', 'wc_disable_admin_bar', 10, 1 );
 
-if ( ! function_exists( 'wc_create_new_customer' ) ) {
+if ( ! function_exists( 'wc_create_new_user' ) ) {
 
 	/**
-	 * Create a new customer.
+	 * Create a new user.
 	 *
-	 * @param  string $email Customer email.
-	 * @param  string $username Customer username.
-	 * @param  string $password Customer password.
-	 * @return int|WP_Error Returns WP_Error on failure, Int (user ID) on success.
+	 * @param  string $email    User email.
+	 * @param  string $username User username.
+	 * @param  string $password User password.
+	 * @return int|WP_Error     Returns WP_Error on failure, Int (user ID) on success.
 	 */
-	function wc_create_new_customer( $email, $username = '', $password = '' ) {
+	function wc_create_new_user( $email, $username = '', $password = '' ) {
 
 		// Check the email address.
 		if ( empty( $email ) || ! is_email( $email ) ) {
@@ -98,22 +98,21 @@ if ( ! function_exists( 'wc_create_new_customer' ) ) {
 			return $errors;
 		}
 
-		$new_customer_data = apply_filters( 'woocommerce_new_customer_data', array(
+		$new_user_data = apply_filters( 'woocommerce_new_user_data', array(
 			'user_login' => $username,
 			'user_pass'  => $password,
 			'user_email' => $email,
-			'role'       => 'customer',
 		) );
 
-		$customer_id = wp_insert_user( $new_customer_data );
+		$user_id = wp_insert_user( $new_user_data );
 
-		if ( is_wp_error( $customer_id ) ) {
+		if ( is_wp_error( $user_id ) ) {
 			return new WP_Error( 'registration-error', '<strong>' . __( 'ERROR', 'woocommerce' ) . '</strong>: ' . __( 'Couldn&#8217;t register you&hellip; please contact us if you continue to have problems.', 'woocommerce' ) );
 		}
 
-		do_action( 'woocommerce_created_customer', $customer_id, $new_customer_data, $password_generated );
+		do_action( 'woocommerce_created_user', $user_id, $new_user_data, $password_generated );
 
-		return $customer_id;
+		return $user_id;
 	}
 }
 
