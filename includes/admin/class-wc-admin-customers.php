@@ -48,7 +48,7 @@ class WC_Admin_Customers {
 	}
 
 	/**
-	 * Add per page screen option to the Affiliates list table
+	 * Add per page screen option to the Customers list table
 	 *
 	 * @access public
 	 * @static
