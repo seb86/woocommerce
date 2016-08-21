@@ -15,14 +15,14 @@
  * @see 	https://docs.woothemes.com/document/template-structure/
  * @author  WooThemes
  * @package WooCommerce/Templates
- * @version 2.6.0
+ * @version 2.7.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$saved_methods = wc_get_customer_saved_methods_list( get_current_user_id() );
+$saved_methods = wc_get_customer_saved_methods_list( wc_get_customer_id( get_current_user_id() ) );
 $has_methods   = (bool) $saved_methods;
 $types         = wc_get_account_payment_methods_types();
 
