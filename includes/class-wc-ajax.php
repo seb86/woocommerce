@@ -1101,24 +1101,24 @@ class WC_AJAX {
 			die(-1);
 		}
 
-		$user_id      = (int) trim(stripslashes($_POST['user_id']));
+		$customer_id      = (int) trim(stripslashes($_POST['customer_id']));
 		$type_to_load = esc_attr(trim(stripslashes($_POST['type_to_load'])));
 
 		$customer_data = array(
-			$type_to_load . '_first_name' => get_user_meta( $user_id, $type_to_load . '_first_name', true ),
-			$type_to_load . '_last_name'  => get_user_meta( $user_id, $type_to_load . '_last_name', true ),
-			$type_to_load . '_company'    => get_user_meta( $user_id, $type_to_load . '_company', true ),
-			$type_to_load . '_address_1'  => get_user_meta( $user_id, $type_to_load . '_address_1', true ),
-			$type_to_load . '_address_2'  => get_user_meta( $user_id, $type_to_load . '_address_2', true ),
-			$type_to_load . '_city'       => get_user_meta( $user_id, $type_to_load . '_city', true ),
-			$type_to_load . '_postcode'   => get_user_meta( $user_id, $type_to_load . '_postcode', true ),
-			$type_to_load . '_country'    => get_user_meta( $user_id, $type_to_load . '_country', true ),
-			$type_to_load . '_state'      => get_user_meta( $user_id, $type_to_load . '_state', true ),
-			$type_to_load . '_email'      => get_user_meta( $user_id, $type_to_load . '_email', true ),
-			$type_to_load . '_phone'      => get_user_meta( $user_id, $type_to_load . '_phone', true ),
+			$type_to_load . '_first_name' => wc_get_customer_meta( $customer_id, $type_to_load . '_first_name', true ),
+			$type_to_load . '_last_name'  => wc_get_customer_meta( $customer_id, $type_to_load . '_last_name', true ),
+			$type_to_load . '_company'    => wc_get_customer_meta( $customer_id, $type_to_load . '_company', true ),
+			$type_to_load . '_address_1'  => wc_get_customer_meta( $customer_id, $type_to_load . '_address_1', true ),
+			$type_to_load . '_address_2'  => wc_get_customer_meta( $customer_id, $type_to_load . '_address_2', true ),
+			$type_to_load . '_city'       => wc_get_customer_meta( $customer_id, $type_to_load . '_city', true ),
+			$type_to_load . '_postcode'   => wc_get_customer_meta( $customer_id, $type_to_load . '_postcode', true ),
+			$type_to_load . '_country'    => wc_get_customer_meta( $customer_id, $type_to_load . '_country', true ),
+			$type_to_load . '_state'      => wc_get_customer_meta( $customer_id, $type_to_load . '_state', true ),
+			$type_to_load . '_email'      => wc_get_customer_meta( $customer_id, $type_to_load . '_email', true ),
+			$type_to_load . '_phone'      => wc_get_customer_meta( $customer_id, $type_to_load . '_phone', true ),
 		);
 
-		$customer_data = apply_filters( 'woocommerce_found_customer_details', $customer_data, $user_id, $type_to_load );
+		$customer_data = apply_filters( 'woocommerce_found_customer_details', $customer_data, $customer_id, $type_to_load );
 
 		wp_send_json( $customer_data );
 	}
