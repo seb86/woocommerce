@@ -183,7 +183,7 @@ class WC_Customers_Table extends WP_List_Table {
 				break;
 
 			case 'customer_type':
-				$value = __( 'Customer', 'woocommerce' ); // TODO: Replace with get customer type function
+				$value = wc_get_customer_type( esc_html( $item[ 'email' ] ) );
 				break;
 
 			case 'registered':
