@@ -64,7 +64,7 @@ class WC_Admin_Customers {
 	 * @access public
 	 */
 	public static function output() {
-		if ( ! isset( $_GET['view-user'] ) ) {
+		if ( ! isset( $_GET['view_customer'] ) ) {
 
 			include_once( 'customers/class-wc-admin-customers-table.php' );
 			return self::get_customers();
