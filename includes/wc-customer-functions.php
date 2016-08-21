@@ -102,15 +102,30 @@ function wc_delete_customer_meta( $customer_id, $meta_key ) {
  * Returns the customer ID if the user is a customer.
  *
  * @param  int $user_id The WordPress user ID
- * @return int
+ * @return int|bool
  */
 function wc_get_customer_id( $user_id = 0 ) {
 	$logged_in_user = get_current_user_id();
 
 	if ( isset( $user_id ) && $user_id > 0 ) {
-		return wc_get_customer( $user_id, 'customer_id' );
+		return wc_get_customer( $user_id, '', 'customer_id' );
 	} else {
-		return wc_get_customer( $logged_in_user, 'customer_id' );
+		return wc_get_customer( $logged_in_user, '', 'customer_id' );
+	}
+
+	return false;
+}
+
+/**
+ * Returns the user ID from a customer.
+ *
+ * @param  int $customer_id The customer ID
+ * @return int|bool
+ */
+function wc_get_customer_user_id( $customer_id = 0 ) {
+
+	if ( isset( $customer_id ) && $customer_id > 0 ) {
+		return wc_get_customer( $customer_id, '', 'user_id' );
 	}
 
 	return false;
@@ -120,18 +135,37 @@ function wc_get_customer_id( $user_id = 0 ) {
  * Returns the customer email if the user/guest is a customer.
  *
  * @param  string $user_email WP User or Guest customer email address
- * @return int
+ * @return int|bool
  */
 function wc_get_customer_email( $user_email = '' ) {
-	$logged_in_user = get_current_user_id();
-
 	if ( isset( $user_email ) ) {
-		return wc_get_customer( '', 'email' );
-	} else {
-		return wc_get_customer( $logged_in_user, 'email' );
+		return wc_get_customer( '', $user_email, 'email' );
 	}
 
 	return false;
+}
+
+/**
+ * Returns the customer type.
+ *
+ * @param  string $customer_email The customers email address
+ * @return string
+ */
+function wc_get_customer_type( $customer_email = '' ) {
+	$customer = wc_get_customer( '', $customer_email );
+
+	// If customer found then return customer type.
+	if ( $customer ) {
+		if ( isset( $customer['user_id'] ) ) {
+			$customer_type = __( 'Customer', 'woocommerce' );
+		} else {
+			$customer_type = __( 'Guest Customer', 'woocommerce' );
+		}
+
+		return apply_filters( 'woocommerce_customer_type', $customer_type );
+	}
+
+	return;
 }
 
 /**
@@ -139,10 +173,11 @@ function wc_get_customer_email( $user_email = '' ) {
  *
  * @global object $wpdb    WP Database
  * @param  int    $user_id
+ * @param  string $customer_email
  * @param  string $field
  * @return int|bool|string|date|array
  */
-function wc_get_customer( $user_id = 0, $field = '' ) {
+function wc_get_customer( $user_id = '', $customer_email = '', $field = '*' ) {
 	// If field is not set then return
 	if ( ! isset( $field ) ) return false;
 
@@ -150,8 +185,14 @@ function wc_get_customer( $user_id = 0, $field = '' ) {
 
 	$table = $wpdb->prefix . 'woocommerce_customers';
 
-	$results = $wpdb->get_var( $wpdb->prepare( "SELECT `{$field}` FROM `{$table}` WHERE `user_id` = %s", $user_id ) );
+	// First check if we are querying where the user ID or customers email address.
+	if ( empty( $user_id ) && ! empty( $customer_email ) ) {
+		$results = $wpdb->get_row( "SELECT {$field} FROM {$table} WHERE `email` = '{$customer_email}'", ARRAY_A );
+	} else {
+		$results = $wpdb->get_row( "SELECT `{$field}` FROM `{$table}` WHERE `user_id` = '{$user_id}'", ARRAY_A );
+	}
 
+	// If results found then return them.
 	if ( isset( $results ) ) {
 		return $results;
 	}
@@ -209,6 +250,8 @@ function wc_create_new_customer( $user_id = '', $email = '', $first_name = '', $
 	if ( wc_check_customer_has_user( $user_email ) ) {
 		return new WP_Error( 'customer_has_email', __( 'A customer already exists with this email address.', 'woocommerce' ) );
 	}
+
+	$registered = gmdate( 'Y-m-d H:i:s' );
 
 	// All clear, create new customer.
 	$compacted = compact( 'user_id', 'email', 'first_name', 'last_name', 'registered', 'guest_key' );
