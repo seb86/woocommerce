@@ -15,6 +15,50 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Register the table with $wpdb so the metadata api can find it
+ */
+function register_customer_table() {
+	global $wpdb;
+
+	$wpdb->customermeta = $wpdb->prefix . 'woocommerce_customermeta';
+}
+add_action( 'plugins_loaded', 'register_customer_table', 11 );
+
+/**
+ * Returns the default customer meta keys.
+ *
+ * @return array
+ */
+function wc_default_customer_meta_keys() {
+	return array(
+		'billing_first_name'   => __( 'Billing First Name', 'woocommerce' ),
+		'billing_last_name'    => __( 'Billing Last Name', 'woocommerce' ),
+		'billing_company'      => __( 'Billing Company', 'woocommerce' ),
+		'billing_phone'        => __( 'Billing Phone Number', 'woocommerce' ),
+		'billing_email'        => __( 'Billing Email', 'woocommerce' ),
+		'billing_address_1'    => __( 'Billing Address Line 1', 'woocommerce' ),
+		'billing_address_2'    => __( 'Billing Address Line 2', 'woocommerce' ),
+		'billing_city'         => __( 'Billing City', 'woocommerce' ),
+		'billing_postcode'     => __( 'Billing Postcode', 'woocommerce' ),
+		'billing_country'      => __( 'Billing Country', 'woocommerce' ),
+		'billing_state'        => __( 'Billing State', 'woocommerce' ),
+		'shipping_first_name'  => __( 'Shipping First Name', 'woocommerce' ),
+		'shipping_last_name'   => __( 'Shipping Last Name', 'woocommerce' ),
+		'shipping_company'     => __( 'Shipping Company', 'woocommerce' ),
+		'shipping_address_1'   => __( 'Shipping Address Line 1', 'woocommerce' ),
+		'shipping_address_2'   => __( 'Shipping Address Line 2', 'woocommerce' ),
+		'shipping_city'        => __( 'Shipping City', 'woocommerce' ),
+		'shipping_postcode'    => __( 'Shipping Postcode', 'woocommerce' ),
+		'shipping_country'     => __( 'Shipping Country', 'woocommerce' ),
+		'shipping_state'       => __( 'Shipping State', 'woocommerce' ),
+		'paying_customer'      => __( 'Paying Customer', 'woocommerce' ),
+		'_money_spent'         => __( 'Money Spent', 'woocommerce' ),
+		'_order_count'         => __( 'Order Count', 'woocommerce' ),
+		'last_updated'         => __( 'Last Updated', 'woocommerce' ),
+	);
+}
+
+/**
  * Add customer meta data field for a customer.
  *
  * @param  int    $customer_id (Required) The customer ID is for
@@ -63,32 +107,7 @@ function wc_update_customer_meta( $customer_id, $meta_key, $meta_value, $prev_va
  * @return int|bool
  */
 function wc_delete_customer_meta( $customer_id, $meta_key ) {
-	$default_meta_keys = array(
-		'billing_first_name',
-		'billing_last_name',
-		'billing_company',
-		'billing_phone',
-		'billing_email',
-		'billing_address_1',
-		'billing_address_2',
-		'billing_city',
-		'billing_postcode',
-		'billing_country',
-		'billing_state',
-		'shipping_first_name',
-		'shipping_last_name',
-		'shipping_company',
-		'shipping_address_1',
-		'shipping_address_2',
-		'shipping_city',
-		'shipping_postcode',
-		'shipping_country',
-		'shipping_state',
-		'paying_customer',
-		'_money_spent',
-		'_order_count',
-		'last_updated',
-	);
+	$default_meta_keys = wc_default_customer_meta_keys();
 
 	// If the meta key is not a default customer meta key then delete it.
 	if ( ! in_array( $meta_key, $default_meta_keys ) ) {
@@ -178,9 +197,6 @@ function wc_get_customer_type( $customer_email = '' ) {
  * @return int|bool|string|date|array
  */
 function wc_get_customer( $user_id = '', $customer_email = '', $field = '*' ) {
-	// If field is not set then return
-	if ( ! isset( $field ) ) return false;
-
 	global $wpdb;
 
 	$table = $wpdb->prefix . 'woocommerce_customers';
@@ -189,7 +205,7 @@ function wc_get_customer( $user_id = '', $customer_email = '', $field = '*' ) {
 	if ( empty( $user_id ) && ! empty( $customer_email ) ) {
 		$results = $wpdb->get_row( "SELECT {$field} FROM {$table} WHERE `email` = '{$customer_email}'", ARRAY_A );
 	} else {
-		$results = $wpdb->get_row( "SELECT `{$field}` FROM `{$table}` WHERE `user_id` = '{$user_id}'", ARRAY_A );
+		$results = $wpdb->get_row( "SELECT {$field} FROM `{$table}` WHERE `user_id` = '{$user_id}'", ARRAY_A );
 	}
 
 	// If results found then return them.
