@@ -45,7 +45,7 @@ class WC_Customers_Table extends WP_List_Table {
 	 * @global $wpdb
 	 * @return mixed
 	 */
-	public function get_customers( $per_page = 20, $page_number = 1 ) {
+	public function get_customers( $per_page = 30, $page_number = 1 ) {
 		global $wpdb;
 
 		$sql = "SELECT * FROM {$wpdb->prefix}woocommerce_customers";
@@ -158,11 +158,11 @@ class WC_Customers_Table extends WP_List_Table {
 		switch ( $column_name ) {
 
 			case 'thumb' :
-				$value = '<a href="' . esc_url( admin_url( 'admin.php?page=wc-customers&view_customer=' . esc_html( $item['customer_id'] ) ) ) . '">' . get_avatar( $item['email'], 32 ) . '</a>';
+				$value = '<a href="' . esc_url( admin_url( 'admin.php?page=wc-customers&mode=edit&customer_id=' . esc_html( $item['customer_id'] ) ) ) . '">' . get_avatar( $item['email'], 32 ) . '</a>';
 				break;
 
 			case 'customer_id':
-				$value = '#' . $item['customer_id'] . ' - <a href="' . esc_url( admin_url( 'admin.php?page=wc-customers&view_customer=' . esc_html( $item['customer_id'] ) ) ) . '">' . esc_html( __( 'View Customer', 'woocommerce' ) ) . '</a>';
+				$value = '#' . $item['customer_id'] . ' - <a href="' . esc_url( admin_url( 'admin.php?page=wc-customers&mode=edit&customer_id=' . esc_html( $item['customer_id'] ) ) ) . '">' . esc_html( __( 'View Customer', 'woocommerce' ) ) . '</a>';
 				break;
 
 			case 'first_name':
