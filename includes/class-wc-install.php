@@ -466,6 +466,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_attribute_taxonomies (
 CREATE TABLE {$wpdb->prefix}woocommerce_customers (
   customer_id bigint(20) NOT NULL auto_increment,
   user_id bigint(20) NULL,
+  email varchar(50) NULL,
   first_name mediumtext NULL,
   last_name mediumtext NULL,
   registered datetime NULL default null,
