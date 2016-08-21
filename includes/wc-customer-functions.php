@@ -64,20 +64,30 @@ function wc_update_customer_meta( $customer_id, $meta_key, $meta_value, $prev_va
  */
 function wc_delete_customer_meta( $customer_id, $meta_key ) {
 	$default_meta_keys = array(
+		'billing_first_name',
+		'billing_last_name',
+		'billing_company',
+		'billing_phone',
+		'billing_email',
 		'billing_address_1',
 		'billing_address_2',
 		'billing_city',
 		'billing_postcode',
 		'billing_country',
 		'billing_state',
+		'shipping_first_name',
+		'shipping_last_name',
+		'shipping_company',
 		'shipping_address_1',
 		'shipping_address_2',
 		'shipping_city',
 		'shipping_postcode',
 		'shipping_country',
 		'shipping_state',
-		'is_vat_exempt',
-		'calculated_shipping',
+		'paying_customer',
+		'_money_spent',
+		'_order_count',
+		'last_updated',
 	);
 
 	// If the meta key is not a default customer meta key then delete it.
@@ -94,7 +104,7 @@ function wc_delete_customer_meta( $customer_id, $meta_key ) {
  * @param  int $user_id The WordPress user ID
  * @return int
  */
-function wc_get_customer_id( $user_id = 0; ) {
+function wc_get_customer_id( $user_id = 0 ) {
 	$logged_in_user = get_current_user_id();
 
 	if ( isset( $user_id ) && $user_id > 0 ) {
@@ -107,25 +117,110 @@ function wc_get_customer_id( $user_id = 0; ) {
 }
 
 /**
- * Returns the customer ID if the user is a customer.
+ * Returns the customer email if the user/guest is a customer.
  *
- * @global $wpdb
+ * @param  string $user_email WP User or Guest customer email address
+ * @return int
+ */
+function wc_get_customer_email( $user_email = '' ) {
+	$logged_in_user = get_current_user_id();
+
+	if ( isset( $user_email ) ) {
+		return wc_get_customer( '', 'email' );
+	} else {
+		return wc_get_customer( $logged_in_user, 'email' );
+	}
+
+	return false;
+}
+
+/**
+ * Returns the customer field if customer exists.
+ *
+ * @global object $wpdb    WP Database
  * @param  int    $user_id
  * @param  string $field
- * @return int|string|date|array
+ * @return int|bool|string|date|array
  */
 function wc_get_customer( $user_id = 0, $field = '' ) {
-	if ( isset( $user_id ) && $user_id > 0 ) {
+	// If field is not set then return
+	if ( ! isset( $field ) ) return false;
 
-		// If field is not set then return
-		if ( ! isset( $field ) ) return false;
+	global $wpdb;
 
-		global $wpdb;
+	$table = $wpdb->prefix . 'woocommerce_customers';
 
-		$table = $wpdb->prefix . 'woocommerce_customers';
+	$results = $wpdb->get_var( $wpdb->prepare( "SELECT `{$field}` FROM `{$table}` WHERE `user_id` = %s", $user_id ) );
 
-		$results = $wpdb->get_var( $wpdb->prepare( "SELECT `{$field}` FROM `{$table}` WHERE `user_id` = %s", $user_id ) );
-
+	if ( isset( $results ) ) {
 		return $results;
 	}
+
+	return false;
+}
+
+/**
+ * Checks if a customer has already been assigned to a user.
+ *
+ * @param  int|string $user_value
+ * @return bool
+ */
+function wc_check_customer_has_user( $user_value ) {
+	// Check if customer has user by ID
+	if ( is_int( $user_value ) ) {
+
+		if ( wc_get_customer_id( $user_value ) ) {
+			return true;
+		}
+
+	}
+	// Check if guest customer has email
+	else if( is_string( $user_value ) ) {
+
+		if ( wc_get_customer_email( $user_value ) ) {
+			return true;
+		}
+
+	}
+
+	return false;
+}
+
+/**
+ * Create a new customer.
+ *
+ * @global object   $wpdb       WP Database
+ * @param  int      $user_id
+ * @param  string   $email
+ * @param  string   $first_name
+ * @param  string   $last_name
+ * @param  string   $guest_key
+ * @return int|bool $customer_id Return customer ID
+ */
+function wc_create_new_customer( $user_id = '', $email = '', $first_name = '', $last_name = '', $guest_key = '' ) {
+	global $wpdb;
+
+	// First check that a customer was not already created and assigned to a user.
+	if ( wc_check_customer_has_user( $user_id ) ) {
+		return new WP_Error( 'customer_has_user_id', __( 'A customer has already been assigned to a user.', 'woocommerce' ) );
+	}
+
+	// Now check that a customer with the email was not already registered.
+	if ( wc_check_customer_has_user( $user_email ) ) {
+		return new WP_Error( 'customer_has_email', __( 'A customer already exists with this email address.', 'woocommerce' ) );
+	}
+
+	// All clear, create new customer.
+	$compacted = compact( 'user_id', 'email', 'first_name', 'last_name', 'registered', 'guest_key' );
+	$data = wp_unslash( $compacted );
+
+	$wpdb->insert( $wpdb->customers, $data );
+	$customer_id = (int) $wpdb->insert_id;
+
+	// Update the user role to "Customer" if user id was provided.
+	if ( isset( $user_id ) ) {
+		wp_update_user( array( 'ID' => $user_id, 'role' => 'customer' ) );
+	}
+
+	return $customer_id;
 }
