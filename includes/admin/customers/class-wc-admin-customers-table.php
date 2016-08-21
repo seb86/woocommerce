@@ -92,7 +92,7 @@ class WC_Customers_Table extends WP_List_Table {
 		$hidden   = array(); // No hidden columns
 		$sortable = $this->get_sortable_columns();
 
-		$per_page     = $this->get_items_per_page( 'customers_per_page', 5 );
+		$per_page     = $this->get_items_per_page( 'customers_per_page', 20 );
 		$current_page = $this->get_pagenum();
 
 		$data = $this->get_customers( $per_page, $current_page );
@@ -121,10 +121,12 @@ class WC_Customers_Table extends WP_List_Table {
 		return apply_filters( 'woocommerce_admin_customer_columns', array(
 			'thumb'          => __( 'Profile', 'woocommerce' ),
 			'customer_id'    => __( 'Customer ID', 'woocommerce' ),
-			'name'           => __( 'Name', 'woocommerce' ),
+			'first_name'     => __( 'First Name', 'woocommerce' ),
+			'last_name'      => __( 'Last Name', 'woocommerce' ),
 			'email'          => __( 'Email', 'woocommerce' ),
 			'purchase_count' => __( 'Purchases', 'woocommerce' ),
 			'registered'     => __( 'Date Registered', 'woocommerce' ),
+			'last_updated'   => __( 'Last Updated', 'woocommerce' ),
 			'customer_type'  => __( 'Customer Type', 'woocommerce' ),
 		) );
 	}
@@ -137,13 +139,11 @@ class WC_Customers_Table extends WP_List_Table {
 	 */
 	public function get_sortable_columns() {
 		return apply_filters( 'woocommerce_admin_customer_sortable_columns', array(
-			'thumb'          => array( 'thumb', false ),
 			'customer_id'    => array( 'customer_id', true ),
-			'name'           => array( 'name', true ),
-			'email'          => array( 'email', false ),
-			'purchase_count' => array( 'purchase_count', false ),
+			'first_name'     => array( 'first_name', true ),
+			'last_name'      => array( 'last_name', true ),
 			'registered'     => array( 'date_registered', true ),
-			'customer_type'  => array( 'customer_type', false ),
+			'last_updated'   => array( 'date_registered', true ),
 		) );
 	}
 
@@ -166,24 +166,29 @@ class WC_Customers_Table extends WP_List_Table {
 				$value = '#' . $item['customer_id'] . ' - <a href="' . esc_url( admin_url( 'admin.php?page=wc-customers&view-user=' . esc_html( $item['customer_id'] ) ) ) . '">' . esc_html( __( 'View Customer', 'woocommerce' ) ) . '</a>';
 				break;
 
-			case 'name':
-				$value = '<strong>' . esc_html( $item[ $column_name ] ) . '</strong>';
+			case 'first_name':
+				$value = '<strong>' . esc_html( $item[ 'first_name' ] ) . '</strong>';
+				break;
+
+			case 'last_name':
+				$value = '<strong>' . esc_html( $item[ 'last_name' ] ) . '</strong>';
 				break;
 
 			case 'email':
-				$value = esc_html( $item[ $column_name ] );
+				$value = esc_html( $item[ 'email' ] );
 				break;
 
 			case 'purchase_count':
-				$value = '<a href="' . esc_url( admin_url( 'edit.php?post_status=all&post_type=shop_order&_customer_user=' . esc_html( $item['customer_id'] ) ) ) . '">' . $item[ $column_name ] . '</a>';
+				$value = '<a href="' . esc_url( admin_url( 'edit.php?post_status=all&post_type=shop_order&_customer_user=' . esc_html( $item['customer_id'] ) ) ) . '">' . wc_get_customer_order_count( $item['customer_id'] ) . '</a>';
 				break;
 
 			case 'customer_type':
-				$value = 'TODO: Add function here!';
+				$value = __( 'Customer', 'woocommerce' ); // TODO: Replace with get customer type function
 				break;
 
 			case 'registered':
-				$value = date_i18n( get_option( 'date_format' ), strtotime( $item['registered'] ) );
+			case 'last_updated':
+				$value = date_i18n( get_option( 'date_format' ), strtotime( $item[ $column_name ] ) );
 				break;
 
 			default:
